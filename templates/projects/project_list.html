@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Все проекты - KS DESIGN{% endblock %}
+
+{% block content %}
+<!-- Заголовок страницы -->
+<section class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4">НАШИ ПРОЕКТЫ</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Проекты</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Фильтр по категориям -->
+<section class="filter-section py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="category-filter text-center">
+                    <a href="{% url 'projects:list' %}" class="btn btn-filter {% if not current_category %}active{% endif %}">
+                        Все проекты
+                    </a>
+                    {% for category in categories %}
+                    <a href="{% url 'projects:list' %}?category={{ category.id }}"
+                       class="btn btn-filter {% if current_category == category.id|stringformat:'s' %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Сетка проектов -->
+<section class="projects-grid py-5">
+    <div class="container">
+        <div class="row g-4">
+            {% for project in projects %}
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                <div class="project-card">
+                    <img src="{{ project.main_image.url }}" alt="{{ project.title }}" class="img-fluid">
+                    <div class="project-overlay">
+                        <h3>{{ project.title }}</h3>
+                        <p>{{ project.category.name }} | {{ project.area }} м²</p>
+                        <a href="{% url 'projects:detail' project.id %}" class="btn btn-light">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <h3>Проекты скоро будут добавлены</h3>
+                <p class="text-muted">Следите за обновлениями</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

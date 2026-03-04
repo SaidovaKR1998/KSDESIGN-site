@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row min-vh-100 align-items-center">
+            <div class="col-lg-8" data-aos="fade-up">
+                <h1 class="display-3 fw-bold mb-4">СОЗДАЮ ПРОСТРАНСТВА,<br>В КОТОРЫЕ ХОЧЕТСЯ ВОЗВРАЩАТЬСЯ</h1>
+                <p class="lead mb-4">Я разрабатываю уникальные проекты для жилых и коммерческих помещений, где каждая деталь — воплощение ваших потребностей и желаний.</p>
+                <a href="#contact" class="btn btn-primary btn-lg">Обсудить проект</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Проекты -->
+<section id="projects" class="projects-section">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+            <h2>МОИ ПРОЕКТЫ</h2>
+            <a href="{% url 'projects:list' %}" class="btn btn-outline-primary mt-3">СМОТРЕТЬ ВСЕ РАБОТЫ</a>
+        </div>
+
+        <div class="row g-4 mt-4">
+            {% for project in featured_projects %}
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                <div class="project-card">
+                    <img src="{{ project.main_image.url }}" alt="{{ project.title }}" class="img-fluid">
+                    <div class="project-overlay">
+                        <h3>{{ project.title }}</h3>
+                        <p>{{ project.category.name }}</p>
+                        <a href="{% url 'projects:detail' project.id %}" class="btn btn-light">Смотреть</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Обо мне -->
+<section id="about" class="about-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <img src="{% if about %}{{ about.image.url }}{% else %}{% static 'images/about-placeholder.jpg' %}{% endif %}" alt="Кристина" class="img-fluid rounded-3">
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <h2 class="section-title mb-4">ОБО МНЕ</h2>
+                {% if about %}
+                    <div class="about-content">
+                        {{ about.content|safe }}
+                    </div>
+                {% else %}
+                    <p>Привет, меня зовут Кристина. Я архитектурный дизайнер, занимаюсь проектированием интерьеров жилых и коммерческих помещений.</p>
+                    <p>Я создаю места, в которые хочется возвращаться. Для меня дом – это ресурс, который нужно грамотно использовать. Моя задача – сделать функциональное и гармоничное пространство для жизни, а также помочь вам в процессе его реализации.</p>
+                {% endif %}
+
+                <div class="row mt-4 g-2 justify-content-center">
+                     {% for stat in statistics %}
+                     <div class="col-6 col-md-3 mb-3">
+                         <div class="stat-item">
+                             <div class="stat-value">{{ stat.value }}</div>
+                             <div class="stat-label">{{ stat.label }}</div>
+                         </div>
+                     </div>
+                     {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Услуги -->
+<section id="services" class="services-section">
+    <div class="container">
+        <h2 class="section-title text-center mb-5" data-aos="fade-up">МОИ УСЛУГИ</h2>
+
+        <div class="row">
+            {% for service in services %}
+            <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                <div class="service-card">
+                    <h3>{{ service.name }}</h3>
+                    <div class="price-tag">{{ service.price_per_m2 }} ₽/м²</div>
+                    <div class="service-description">
+                        {{ service.description|safe }}
+                    </div>
+                    <ul class="service-features">
+                        {% for feature in service.get_features_list %}
+                        <li><i class="fas fa-check text-success me-2"></i>{{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-<!-- Этапы работы -->
+<section id="stages" class="stages-section">
+    <div class="container">
+        <h2 class="section-title text-center mb-5" data-aos="fade-up">ЭТАПЫ РАБОТЫ</h2>
+
+        <div class="row">
+            <!-- Этап 1: Замер помещения -->
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="stage-card">
+                    <div class="stage-number">1</div>
+                    <i class="fas fa-ruler-combined stage-icon"></i>
+                    <h3>Замер помещения</h3>
+                    <p>На первом этапе проводятся замеры помещения, а также обсуждается ход работы и пожелания заказчика. Который заполнит бриф-анкету для дизайнера, с помощью которой я выявляю ваши интересы и палитру ваших цветовых предпочтений.</p>
+                </div>
+            </div>
+
+            <!-- Этап 2: Разработка планировки -->
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="stage-card">
+                    <div class="stage-number">2</div>
+                    <i class="fas fa-draw-polygon stage-icon"></i>
+                    <h3>Разработка планировки</h3>
+                    <p>На основании бриф-анкеты от заказчика я разрабатываю 3-5 вариантов планировки. Выбранный вариант мы корректируем и вносим правки. После утверждения итоговой планировки вы получаете объемную планировку в программе BIMAX на вашем смартфоне.</p>
+                </div>
+            </div>
+
+            <!-- Этап 3: Разработка концепции -->
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="stage-card">
+                    <div class="stage-number">3</div>
+                    <i class="fas fa-palette stage-icon"></i>
+                    <h3>Разработка концепции</h3>
+                    <p>Разработка коллажа, который отражает стиль, цветовую гамму интерьера, основной материал и текстуру.</p>
+                </div>
+            </div>
+
+            <!-- Этап 4: Электрика -->
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="stage-card">
+                    <div class="stage-number">4</div>
+                    <i class="fas fa-bolt stage-icon"></i>
+                    <h3>Электрика</h3>
+                    <p>Я представляю заказчику чертежи электрики для согласования по размещению тех или иных позиций.</p>
+                </div>
+            </div>
+
+            <!-- Этап 5: Визуализация помещений -->
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="stage-card">
+                    <div class="stage-number">5</div>
+                    <i class="fas fa-camera-retro stage-icon"></i>
+                    <h3>Визуализация помещений</h3>
+                    <p>Фотореалистичные визуализации для каждого помещения (2-4 шт. на помещение)</p>
+                </div>
+            </div>
+
+            <!-- Этап 6: Рабочие чертежи -->
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="600">
+                <div class="stage-card">
+                    <div class="stage-number">6</div>
+                    <i class="fas fa-drafting-compass stage-icon"></i>
+                    <h3>Рабочие чертежи</h3>
+                    <p>Все, что необходимо строителям для реализации интерьера. Также вы получите все спецификации отделочных материалов и электрофурнитуры. По завершению работы над дизайн проектом вы получаете готовый альбом с рабочими чертежами и визуализациями.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Контакты и форма -->
+<section id="contact" class="contact-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h2 class="section-title mb-4">С НАМИ ВЫ ПОЛУЧИТЕ</h2>
+                <p class="lead mb-5">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД И КАЧЕСТВЕННЫЙ РЕЗУЛЬТАТ!</p>
+
+                {% if contacts %}
+                <div class="contact-info">
+                    <p><i class="fas fa-user me-3"></i>{{ contacts.name }}</p>
+                    <p><i class="fas fa-phone me-3"></i>{{ contacts.phone }}</p>
+                    <p><i class="fas fa-envelope me-3"></i>{{ contacts.email }}</p>
+                </div>
+                {% endif %}
+
+                <!-- НОВЫЙ БЛОК: Социальные сети -->
+                <div class="social-links mt-4">
+                    <h4 class="mb-3">Подписывайтесь на меня в соцсетях:</h4>
+                    <div class="d-flex gap-3">
+                        <!-- Telegram -->
+                        <a href="https://t.me/KristinaSaidova98" target="_blank" class="social-link telegram">
+                            <i class="fab fa-telegram-plane"></i>
+                            <span>Telegram</span>
+                        </a>
+
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/stina_kr_?igsh=ZHR2Y3Fhbjh6ZzM5" target="_blank" class="social-link instagram">
+                            <i class="fab fa-instagram"></i>
+                            <span>Instagram</span>
+                        </a>
+                    </div>
+                    <p class="text-muted small mt-2">
+                        <i class="fas fa-external-link-alt"></i>
+                        Нажмите на иконку, чтобы перейти в мой профиль
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="contact-form">
+                    <h3 class="mb-4">ОСТАВИТЬ ЗАЯВКУ</h3>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.name }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.phone }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Бриф-опросник (оставляем как есть) -->
+        <div class="row mt-5" data-aos="fade-up">
+            <div class="col-12">
+                <div class="brief-section">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <div class="brief-text">
+                                <h3 class="brief-title">Помогите мне понять ваши желания</h3>
+                                <p class="brief-description">
+                                    В брифе-опроснике Вы детально можете рассказать о своих мыслях и пожеланиях.
+                                    Я специально разработала его для заказчиков, чтобы Вы обратили внимание на все
+                                    важные моменты будущего интерьера и всей семьей получили удовольствие от процесса.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="brief-download text-center">
+                                <a href="{% static 'files/brief.pdf' %}" class="btn btn-download" download>
+                                    <i class="fas fa-download me-2"></i>
+                                    Скачать и ознакомиться<br>с Бриф-опросником
+                                </a>
+                                <p class="download-hint mt-2">
+                                    <i class="fas fa-file-pdf text-danger me-1"></i>
+                                    PDF, 2.5 MB
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

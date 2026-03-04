@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - KS DESIGN{% endblock %}
+
+{% block content %}
+<!-- Заголовок страницы с фото проекта -->
+<section class="page-header" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ project.main_image.url }}') center/cover; background-attachment: fixed;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center text-white">
+                <h1 class="display-4">{{ project.title }}</h1>
+                <p class="lead">{{ project.category.name }} | {{ project.area }} м² | {{ project.year }} год</p>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white">Главная</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'projects:list' %}" class="text-white">Проекты</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ project.title }}</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Основной контент -->
+<section class="project-detail py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Левая колонка с галереей и описанием -->
+            <div class="col-lg-8">
+                <!-- ГАЛЕРЕЯ ПРОЕКТА (НОВАЯ) -->
+                <div class="project-gallery mb-5">
+                    <!-- Основное большое фото -->
+                    <div class="main-image-container mb-3">
+                        <img id="mainImage" src="{{ project.main_image.url }}" alt="{{ project.title }}" class="img-fluid main-image" onclick="openFullscreen(this.src)">
+                    </div>
+
+                    <!-- Миниатюры всех фото -->
+                    <div class="thumbnails-container">
+                        <div class="thumbnails-scroll" id="thumbnailsScroll">
+                            <!-- Главное фото как первая миниатюра -->
+                            <div class="thumbnail-item active" onclick="changeImage('{{ project.main_image.url }}', this)">
+                                <img src="{{ project.main_image.url }}" alt="{{ project.title }}" class="img-fluid thumbnail-img">
+                            </div>
+
+                            <!-- Остальные фото из галереи -->
+                            {% for image in project.images.all %}
+                            <div class="thumbnail-item" onclick="changeImage('{{ image.image.url }}', this)">
+                                <img src="{{ image.image.url }}" alt="{{ project.title }}" class="img-fluid thumbnail-img">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Описание проекта -->
+                <div class="project-description">
+                    <h2 class="section-title mb-4">О проекте</h2>
+                    <div class="description-text">
+                        {{ project.description|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Характеристики проекта -->
+                <div class="project-features mt-5">
+                    <h3 class="mb-4">Детали проекта</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="features-list">
+                                <li><i class="fas fa-ruler-combined text-primary me-2"></i> <strong>Площадь:</strong> {{ project.area }} м²</li>
+                                <li><i class="fas fa-calendar text-primary me-2"></i> <strong>Год:</strong> {{ project.year }}</li>
+                                <li><i class="fas fa-tag text-primary me-2"></i> <strong>Категория:</strong> {{ project.category.name }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка с PDF и контактами -->
+            <div class="col-lg-4">
+                <div class="project-sidebar">
+                    <!-- Блок с PDF -->
+                    {% if project.pdf_file %}
+                    <div class="pdf-block mb-4">
+                        <h4 class="mb-3">Документация проекта</h4>
+                        <div class="pdf-card">
+                            <div class="pdf-icon">
+                                <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                            </div>
+                            <div class="pdf-info">
+                                <h5>Презентация проекта</h5>
+                                <p class="text-muted small">PDF файл с подробным описанием</p>
+                                <a href="{{ project.pdf_file.url }}" class="btn btn-download w-100" download>
+                                    <i class="fas fa-download me-2"></i>
+                                    Скачать PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Блок с контактами -->
+                    <div class="contact-block">
+                        <h4 class="mb-3">Хотите такой же проект?</h4>
+                        <p>Свяжитесь со мной для обсуждения вашего проекта</p>
+                        <a href="{% url 'home' %}#contact" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-phone me-2"></i>
+                            Обсудить проект
+                        </a>
+                        <a href="{% url 'home' %}#services" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-list me-2"></i>
+                            Посмотреть услуги
+                        </a>
+                    </div>
+
+                    <!-- Поделиться -->
+                    <div class="share-block mt-4">
+                        <h5>Поделиться проектом:</h5>
+                        <div class="share-links">
+                            <a href="#" class="share-link"><i class="fab fa-vk"></i></a>
+                            <a href="#" class="share-link"><i class="fab fa-telegram"></i></a>
+                            <a href="#" class="share-link"><i class="fab fa-whatsapp"></i></a>
+                            <a href="#" class="share-link"><i class="fab fa-pinterest"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Похожие проекты -->
+{% if related_projects %}
+<section class="related-projects py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Похожие проекты</h2>
+        <div class="row g-4">
+            {% for related in related_projects %}
+            <div class="col-md-4">
+                <div class="project-card">
+                    <img src="{{ related.main_image.url }}" alt="{{ related.title }}" class="img-fluid">
+                    <div class="project-overlay">
+                        <h3>{{ related.title }}</h3>
+                        <p>{{ related.category.name }}</p>
+                        <a href="{% url 'projects:detail' related.id %}" class="btn btn-light">Смотреть</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- СКРИПТЫ ДЛЯ ГАЛЕРЕИ -->
+<script>
+// Функция для смены главного фото при клике на миниатюру
+function changeImage(imageUrl, element) {
+    // Меняем основное изображение
+    document.getElementById('mainImage').src = imageUrl;
+
+    // Убираем класс active у всех миниатюр
+    var thumbnails = document.querySelectorAll('.thumbnail-item');
+    thumbnails.forEach(function(item) {
+        item.classList.remove('active');
+    });
+
+    // Добавляем класс active выбранной миниатюре
+    element.classList.add('active');
+}
+
+// Функция для открытия фото в полном размере
+function openFullscreen(imageUrl) {
+    window.open(imageUrl, '_blank');
+}
+
+// Автоматическая прокрутка к выбранной миниатюре (опционально)
+document.addEventListener('DOMContentLoaded', function() {
+    var activeThumbnail = document.querySelector('.thumbnail-item.active');
+    if (activeThumbnail) {
+        activeThumbnail.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+        });
+    }
+});
+</script>
+
+<!-- ДОПОЛНИТЕЛЬНЫЙ СКРИПТ ДЛЯ ГОРИЗОНТАЛЬНОЙ ПРОКРУТКИ КОЛЕСИКОМ МЫШИ -->
+<script>
+// Прокрутка миниатюр колесиком мыши
+document.addEventListener('DOMContentLoaded', function() {
+    var scrollContainer = document.getElementById('thumbnailsScroll');
+    if (scrollContainer) {
+        scrollContainer.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            scrollContainer.scrollLeft += e.deltaY;
+        });
+    }
+});
+</script>
+
+{% endblock %}
